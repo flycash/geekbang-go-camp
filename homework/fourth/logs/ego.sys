@@ -1,0 +1,23 @@
+{"lv":"info","ts":1632645576,"msg":"init default logger","comp":"core.elog"}
+{"lv":"info","ts":1632645576,"msg":"init ego logger","comp":"core.elog"}
+{"lv":"info","ts":1632645576,"msg":"init config","comp":"core.econf","addr":"configs/local.toml"}
+{"lv":"info","ts":1632645576,"msg":"init max procs","comp":"app","value":12}
+{"lv":"info","ts":1632645576,"msg":"read watch","comp":"core.econf","comp":"file datasource","configFile":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml","realConfigFile":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml","fppath":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml"}
+{"lv":"info","ts":1632645576,"msg":"init trace","comp":"app"}
+{"lv":"info","ts":1632645576,"msg":"start server","comp":"server.egrpc","compName":"server.grpc","addr":"grpc://0.0.0.0:9321"}
+{"lv":"info","ts":1632645648,"msg":"init default logger","comp":"core.elog"}
+{"lv":"info","ts":1632645648,"msg":"init ego logger","comp":"core.elog"}
+{"lv":"info","ts":1632645648,"msg":"init config","comp":"core.econf","addr":"configs/local.toml"}
+{"lv":"info","ts":1632645648,"msg":"init max procs","comp":"app","value":12}
+{"lv":"info","ts":1632645648,"msg":"read watch","comp":"core.econf","comp":"file datasource","configFile":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml","realConfigFile":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml","fppath":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml"}
+{"lv":"info","ts":1632645648,"msg":"init trace","comp":"app"}
+{"lv":"info","ts":1632645648,"msg":"start server","comp":"server.egrpc","compName":"server.grpc","addr":"grpc://0.0.0.0:9321"}
+{"lv":"info","ts":1632645677,"msg":"stop server","comp":"server.egrpc","compName":"server.grpc","addr":"grpc://0.0.0.0:9321"}
+{"lv":"info","ts":1632645677,"msg":"stop Ego, bye!","comp":"app"}
+{"lv":"info","ts":1632646213,"msg":"init default logger","comp":"core.elog"}
+{"lv":"info","ts":1632646213,"msg":"init ego logger","comp":"core.elog"}
+{"lv":"info","ts":1632646213,"msg":"init config","comp":"core.econf","addr":"configs/local.toml"}
+{"lv":"info","ts":1632646213,"msg":"init max procs","comp":"app","value":12}
+{"lv":"info","ts":1632646213,"msg":"read watch","comp":"core.econf","comp":"file datasource","configFile":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml","realConfigFile":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml","fppath":"D:\\workspace\\go\\src\\geekbang\\geekbang-go-camp\\homework\\fourth\\configs\\local.toml"}
+{"lv":"info","ts":1632646213,"msg":"init trace","comp":"app"}
+{"lv":"info","ts":1632646213,"msg":"start server","comp":"server.egrpc","compName":"server.grpc","addr":"grpc://0.0.0.0:9321"}

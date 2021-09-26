@@ -1,0 +1,18 @@
+[server.grpc]
+    port = 9321
+[server.http]
+    port = 9322
+[server.governor]
+    port = 9323
+[etcd]
+addrs=["127.0.0.1:2379"]
+[redis.geekbang]
+    debug = true
+    addr = "10.8.0.1:6479"
+[mysql.geekbang]
+    connMaxLifetime = "300s"
+    debug = true
+    dsn = "root:root@tcp(127.0.0.1:13306)/geekbang-camp?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local"
+    level = "panic"
+    maxIdleConns = 50
+    maxOpenConns = 100

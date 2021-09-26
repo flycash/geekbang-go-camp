@@ -1,0 +1,25 @@
+syntax = "proto3";
+package github.com.geekbang.user;
+
+option go_package = "geekbang/api";
+
+// protoc `--go_out=. `--go_opt=paths=source_relative `--go-grpc_out=. `--go-grpc_opt=paths=source_relative user.proto
+service UserService {
+  rpc UserInfo (UserInfoRequest) returns (UserInfoReply) {} // 获取用户信息
+}
+
+message UserInfoRequest {
+  uint64 uid = 1;
+}
+
+message UserInfoReply {
+  User user = 1;
+}
+
+message User {
+  string nickname = 1;
+  string email = 2;
+  string avatar = 3;
+  string phone = 4;
+  uint64 uid = 5;
+}
