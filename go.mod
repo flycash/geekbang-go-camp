@@ -3,10 +3,12 @@ module geekbang/geekbang-go-camp
 go 1.17
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/google/wire v0.5.0
 	github.com/gotomicro/ego v0.6.13
 	github.com/gotomicro/ego-component/egorm v0.2.2
 	github.com/gotomicro/ego-component/eredis v0.2.3
+	github.com/stretchr/testify v1.7.0
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 )
@@ -24,6 +26,7 @@ require (
 	github.com/go-redis/redis/v8 v8.8.1-0.20210327152210-1e30221353c4 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/subcommands v1.0.1 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.8.0 // indirect
@@ -42,6 +45,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.11.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.26.0 // indirect
@@ -62,10 +66,12 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
+	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40 // indirect
+	golang.org/x/sys v0.0.0-20210925032602-92d5a993a665 // indirect
 	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/tools v0.1.4 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto v0.0.0-20210708141623-e76da96a951f // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

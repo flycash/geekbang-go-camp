@@ -10,6 +10,7 @@ import (
 )
 //  export EGO_DEBUG=true && go run main.go --config=configs/local.toml
 func main() {
+
 	// ego 自身完成了监听信号，然后退出的功能
 	if err := ego.New().Serve(func() *egrpc.Component {
 		srv := egrpc.Load("server.grpc").Build()

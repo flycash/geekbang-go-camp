@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/json"
 	"github.com/gotomicro/ego-component/egorm"
 	"github.com/gotomicro/ego-component/eredis"
 )
@@ -10,6 +11,18 @@ type UserRepo struct {
 	cache *eredis.Component
 }
 
+type DB struct {
+	dsn string
+	username string
+	password string
+	cfg DBConfig
+}
+
+type DBConfig struct {
+	dsn string
+	username string
+	password string
+}
 func NewUserRepo(db *egorm.Component, cache *eredis.Component) *UserRepo {
 	return &UserRepo{
 		db: db,
@@ -27,4 +40,14 @@ type UserPO struct {
 	Nickname string
 }
 
+
+type UserDO struct {
+	Nickname string
+}
+
+func convert()  {
+ bytes, _ := json.Marshal(&UserPO{})
+ do := &UserDO{}
+ json.Unmarshal(bytes, do)
+}
 
