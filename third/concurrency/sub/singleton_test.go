@@ -1,7 +1,7 @@
 package sub
 
 import (
-	"geekbang/geekbang-go-camp/concurrency"
+	"geekbang/geekbang-go-camp/third/concurrency"
 	"testing"
 )
 

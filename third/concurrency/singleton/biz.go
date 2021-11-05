@@ -12,7 +12,7 @@ func Singleton()  {
 var defaultHandler MyHandler
 
 func init() {
-	defaultHandler= new()
+	defaultHandler = new()
 }
 
 func Handle() {
