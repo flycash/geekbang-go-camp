@@ -1,7 +1,7 @@
 package fourth
 
 import (
-	mock_fourth "geekbang/geekbang-go-camp/fourth_test/mock_test"
+	mock_fourth "geekbang/geekbang-go-camp/fourth/mock_test"
 	"github.com/golang/mock/gomock"
 	"testing"
 )
