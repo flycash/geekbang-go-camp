@@ -4,10 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 // 用来保证和第三方库解耦，这里的第三方库是 sql 包
 var NotFound = errors.New("not found")
+var notFoundCode = 40001
+var systemErr = 50001
 
 func Biz() error {
 	err := Dao("")
@@ -33,14 +36,13 @@ func Dao(query string) error {
 		// 同时带上了堆栈信息方便定位
 		return errors.Wrapf(NotFound, fmt.Sprintf("data not found, sql: %s ", query))
 	}
-	
+
 	if err != nil {
 		return errors.Wrapf(err, fmt.Sprintf("db query system error sql: %s ", query))
 	}
 	// do something
 	return nil
 }
-
 
 func Biz1() error {
 	err := Dao("")
@@ -50,7 +52,6 @@ func Biz1() error {
 	}
 	return nil
 }
-
 
 func Dao1(query string) error {
 	err := mockError()
@@ -65,6 +66,35 @@ func Dao1(query string) error {
 	return nil
 }
 
+func Biz2() error {
+	err := Dao("")
+
+	if IsNoRow(err) {
+		// 不管怎么说，出现了数据库查询的问题，可以转为业务领域错误，也可以继续向上传递
+	} else if err != nil {
+
+	}
+	return nil
+}
+
+func Dao2(query string) error {
+	err := mockError()
+
+	if err == sql.ErrNoRows {
+		// 在这一步封装好查询参数，这样DEBUG就能知道请求什么数据，没找到
+		// 同时带上了堆栈信息方便定位
+		// 我们没有仔细区别 err 是什么，反正就是告诉上游，出错了
+		return fmt.Errorf("%d, not found", notFoundCode)
+	} else if err != nil {
+		return fmt.Errorf("%d, not found", systemErr)
+	}
+	// do something
+	return nil
+}
+
+func IsNoRow(err error) bool {
+	return strings.HasPrefix(err.Error(), fmt.Sprintf("%d", notFoundCode))
+}
 
 func mockError() error {
 	return sql.ErrNoRows
