@@ -45,7 +45,10 @@ func SomeBusiness(ctx context.Context) {
 	defer span.Finish()
 }
 
-func InjectTracing(ctx context.Context)  {
+// --- span start ---
+// inject tracing ——可以不必自己再开一个 span
+// --- span end
+func InjectTracing(ctx context.Context) {
 	if span := opentracing.SpanFromContext(ctx); span != nil {
 		httpClient := &http.Client{}
 		httpReq, _ := http.NewRequest("GET", "http://your request/", nil)
@@ -67,7 +70,7 @@ func InjectTracing(ctx context.Context)  {
 	}
 }
 
-func ExtractTracing(req *http.Request)  {
+func ExtractTracing(req *http.Request) {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		var serverSpan opentracing.Span
 
