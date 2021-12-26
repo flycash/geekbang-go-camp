@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/gin-gonic/gin v1.7.7
-	github.com/golang/mock v1.1.1
+	github.com/golang/mock v1.6.0
 	github.com/google/wire v0.5.0
 	github.com/gotomicro/ego v0.8.0
 	github.com/gotomicro/ego-component/egorm v0.4.0

@@ -5,7 +5,7 @@ import (
 )
 
 func SaveUser(user user.UserAggregate) {
-	// 要分成两步，首先保存 UserEntity
+	// 要分成两步，首先保存 UserEntity - DAO
 	// 其次保存 Address
 	// 这里就会依赖于 DAO 和 Cache
 }

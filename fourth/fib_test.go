@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 )
+
 //
 func BenchmarkFib(b *testing.B) {
 	Fib(40)
@@ -13,7 +14,7 @@ func BenchmarkFib(b *testing.B) {
 
 // go test `-bench=BenchmarkStringJoin1 `-v `-benchmem
 func BenchmarkStringJoin1(b *testing.B) {
-	//b.ReportAllocs() 等效于 -benchmem
+	// b.ReportAllocs() 等效于 -benchmem
 	input := []string{"Hello", "World"}
 	for i := 0; i < b.N; i++ {
 		result := strings.Join(input, " ")
@@ -24,8 +25,8 @@ func BenchmarkStringJoin1(b *testing.B) {
 }
 
 func BenchmarkStringJoin2(b *testing.B) {
-	//b.ReportAllocs() 等效于 -benchmem
-	//b.ReportAllocs()
+	// b.ReportAllocs() 等效于 -benchmem
+	// b.ReportAllocs()
 	input := []string{"Hello", "World"}
 	join := func(strs []string, delim string) string {
 		if len(strs) == 2 {
@@ -88,4 +89,5 @@ func TestFib(t *testing.T) {
 func ExampleFib() {
 	// pass a number
 	Fib(3)
+	// Output: 3
 }
