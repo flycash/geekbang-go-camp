@@ -4,6 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/pingcap/parser"
+	"github.com/pingcap/parser/ast"
+	"github.com/pingcap/parser/format"
+	"github.com/pingcap/parser/model"
+	_ "github.com/pingcap/tidb/types/parser_driver"
+	"go.uber.org/zap/buffer"
 )
 
 // Sharding 整个 sharding 的过程
@@ -12,18 +19,44 @@ import (
 // 类似于 MySQL 的 driver
 // 出于教学的目的，这里我们尝试自己定义接口，会更加清晰
 type Sharding interface {
-	Exec(ctx context.Context, sql string, args... interface{}) (sql.Result, error)
-	Query(ctx context.Context, sql string, args... interface{}) (sql.Rows, error)
+	Exec(ctx context.Context, sql string, args ...interface{}) (sql.Result, error)
+	Query(ctx context.Context, sql string, args ...interface{}) (*sql.Rows, error)
 }
 
 type mockShard struct {
 	rewriter Rewriter
 	executor Executor
-	merger Merger
+	merger   Merger
 }
 
-func (m *mockShard) Query(ctx context.Context, sql string, args ...interface{}) (sql.Rows, error) {
-	panic("implement me")
+func newMockShard() *mockShard {
+	return &mockShard{
+		rewriter: newAstRewriter(),
+		executor: &simpleExecutor{},
+		merger:   &dispatcherMerger{},
+	}
+}
+
+func (m *mockShard) Query(ctx context.Context, sql string, args ...interface{}) (*sql.Rows, error) {
+	rwRes, err := m.rewriter.Rewrite(ctx, &RewriteContext{
+		sql:  sql,
+		args: args,
+	})
+	if err != nil {
+		return nil, err
+	}
+	exeRes, err := m.executor.Execute(ctx, &ExecuteContext{queries: rwRes.queries})
+	if err != nil {
+		return nil, err
+	}
+
+	mergeRes, err := m.merger.Merge(ctx, &MergeContext{
+		results: exeRes.results,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return mergeRes.rows, err
 }
 
 // Exec 因为我们说 sharding 核心就是三个步骤
@@ -31,7 +64,7 @@ func (m *mockShard) Query(ctx context.Context, sql string, args ...interface{}) 
 // 于是我们引入三个接口来代表这三个过程
 func (m *mockShard) Exec(ctx context.Context, sql string, args ...interface{}) (sql.Result, error) {
 	rwRes, err := m.rewriter.Rewrite(ctx, &RewriteContext{
-		sql: sql,
+		sql:  sql,
 		args: args,
 	})
 	if err != nil {
@@ -51,7 +84,6 @@ func (m *mockShard) Exec(ctx context.Context, sql string, args ...interface{}) (
 	return mergeRes.result, err
 }
 
-
 // Rewriter 代表重写 SQL
 type Rewriter interface {
 	Rewrite(ctx context.Context, rwCtx *RewriteContext) (*RewriteResult, error)
@@ -60,7 +92,7 @@ type Rewriter interface {
 // RewriteContext 代表一个重写上下文，
 // 里面放着你需要的各种数据。
 type RewriteContext struct {
-	sql string
+	sql  string
 	args []interface{}
 }
 
@@ -72,7 +104,7 @@ type RewriteResult struct {
 
 // RewriteQuery 重写后的 SQL
 type RewriteQuery struct {
-	sql string
+	sql  string
 	args []interface{}
 
 	// 你可能需要一些查询特征字段，用于执行和合并结果阶段使用
@@ -80,19 +112,78 @@ type RewriteQuery struct {
 	// 特别是要考虑到后面合并结果的方式五花八门，
 	// 这里的字段可能会非常丰富
 	tableName string
-	dbName string
+	dbName    string
 }
 
 // astRewriter 比如说利用 AST 来实现重写
 type astRewriter struct {
 	cfg *ShardingConfig
+	p   *parser.Parser
+}
+
+type tableNameRewriterVisitor struct {
+	tblName   *ast.TableName
+	args      []interface{}
+	shardFunc func(i interface{}) int
+}
+
+func (a *tableNameRewriterVisitor) Enter(n ast.Node) (node ast.Node, skipChildren bool) {
+	if nd, ok := n.(*ast.TableName); ok {
+		sharded := a.shardFunc(a.args[0])
+		original := nd.Name.String()
+		nd.Name = model.NewCIStr(fmt.Sprintf("%s_%d", original, sharded))
+		a.tblName = nd
+	}
+	// 其实在这里，我们还需要解析 WHERE 部分，确认里面有没有 sharding key，
+	// 并且要确定 sharding key 对应的查询条件
+	// 以及查询条件对应的参数
+	// 在这个例子里面，就是找到 id=? 中问号对应的参数
+	// 但是因为我们只是例子，这里就不找了
+	return n, false
+}
+
+func (a *tableNameRewriterVisitor) Leave(n ast.Node) (node ast.Node, ok bool) {
+	return n, true
+}
+
+func newAstRewriter() *astRewriter {
+	return &astRewriter{
+		p: parser.New(),
+	}
 }
 
 func (a *astRewriter) Rewrite(ctx context.Context, rwCtx *RewriteContext) (*RewriteResult, error) {
 	// 在这里，构建起 AST 树
 	// 修改 AST 的节点。比如说插入主键节点，然后节点的值就是主键生成策略生成的值
 	// 最后将 AST 转为一个 SQL
-	panic("implement me")
+
+	stmtNodes, _, err := a.p.Parse(rwCtx.sql, "", "")
+	if err != nil {
+		return nil, err
+	}
+
+	// 代表的是直接的根节点
+	root := stmtNodes[0]
+	visitor := &tableNameRewriterVisitor{
+		args: rwCtx.args,
+		// 这种如何 shard 的问题，应该是从配置里面解析生成，这里我们直接写死先
+		shardFunc: func(i interface{}) int {
+			return i.(int) % 2
+		},
+	}
+	root.Accept(visitor)
+	bytes := &buffer.Buffer{}
+	_ = root.(*ast.SelectStmt).Restore(format.NewRestoreCtx(format.DefaultRestoreFlags, bytes))
+	s := bytes.String()
+	fmt.Printf("after rewrite: %s \n", s)
+	return &RewriteResult{
+		queries: []*RewriteQuery{{
+			sql:       s,
+			args:      rwCtx.args,
+			tableName: visitor.tblName.Name.String(),
+			dbName:    visitor.tblName.Schema.String(),
+		}},
+	}, nil
 }
 
 type ShardingConfig struct {
@@ -123,8 +214,8 @@ type ExecuteResult struct {
 type QueryResult struct {
 	// 合并结果的时候，Merger 的实现自己知道该用什么字段不该用什么字段
 	queryRows *sql.Rows
-	err error
-	execRes sql.Result
+	err       error
+	execRes   sql.Result
 
 	// 可以考虑改进接口，也可以直接在这里保留
 	query *RewriteQuery
@@ -150,7 +241,7 @@ func (p *simpleExecutor) Execute(ctx context.Context, exeCtx *ExecuteContext) (*
 		res, err := db.ExecContext(ctx, query.sql, query.args...)
 		// 或者是
 		// rows, err := db.QueryContext(ctx, query.sql, query.args...)
-		queryResult = append(queryResult, &QueryResult{ query: query, err: err, execRes: res})
+		queryResult = append(queryResult, &QueryResult{query: query, err: err, execRes: res})
 	}
 	return &ExecuteResult{results: queryResult}, nil
 }
@@ -166,9 +257,9 @@ type MergeContext struct {
 }
 
 type MergeResult struct {
-	rows *sql.Rows
+	rows   *sql.Rows
 	result sql.Result
-	error error
+	error  error
 }
 
 // 门面模式
@@ -190,5 +281,3 @@ func (d *dispatcherMerger) Merge(ctx context.Context, mergeCtx *MergeContext) (*
 	// }
 	panic("implement me")
 }
-
-
